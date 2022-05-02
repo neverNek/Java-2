@@ -6,13 +6,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 public class ClientHandler {
-    private final Socket socket;
-    private final ChatServer server;
-    private final DataInputStream in;
-    private final DataOutputStream out;
-    private final AuthService authService;
+    private  Socket socket;
+    private  ChatServer server;
+    private  DataInputStream in;
+    private  DataOutputStream out;
+    private  AuthService authService;
     private String nick;
 
     public ClientHandler(Socket socket, ChatServer server, AuthService authService) {
@@ -34,6 +35,37 @@ public class ClientHandler {
             }).start();
         } catch (IOException e) {
             throw new RuntimeException("Ошибка создания подключения к клиенту", e);
+        }
+
+        try {
+            this.nick = "";
+            this.socket = socket;
+            this.server = server;
+            this.in = new DataInputStream(socket.getInputStream());
+            this.out = new DataOutputStream(socket.getOutputStream());
+            this.authService = authService;
+            new Thread(() -> {
+                try {
+                    socket.setSoTimeout(120000);
+                    authenticate();
+                    readMessage();
+                } catch(SocketTimeoutException e) {
+                    System.out.println("Connection timed out");
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    server.unsubscribe(this);
+                }
+            }).start();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

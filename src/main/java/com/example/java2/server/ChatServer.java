@@ -30,16 +30,16 @@ public class ChatServer {
         }
     }
 
-    public boolean isNickBusy(String nick) {
+    public synchronized boolean isNickBusy(String nick) {
         return clients.containsKey(nick);
     }
 
-    public void subscribe(ClientHandler client) {
+    public synchronized void subscribe(ClientHandler client) {
         clients.put(client.getNick(), client);
         broadcastClientList();
     }
 
-    private void broadcastClientList() {
+    private synchronized void broadcastClientList() {
         StringBuilder nicks = new StringBuilder();
         for (ClientHandler value : clients.values()) {
             nicks.append(value.getNick()).append(" ");
@@ -48,17 +48,17 @@ public class ChatServer {
         broadcast(Command.CLIENTS, nicks.toString().trim());
     }
 
-    public void broadcast(String msg) {
+    public synchronized void broadcast(String msg) {
         clients.values().forEach(client -> client.sendMessage(msg));
     }
 
-    private void broadcast(Command command, String nicks) {
+    private synchronized void broadcast(Command command, String nicks) {
         for (ClientHandler client : clients.values()) {
             client.sendMessage(command, nicks);
         }
     }
 
-    public void unsubscribe(ClientHandler client) {
+    public synchronized void unsubscribe(ClientHandler client) {
         clients.remove(client.getNick());
         broadcastClientList();
     }
