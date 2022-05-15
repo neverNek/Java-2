@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.PasswordField?>
+
+<?import javafx.scene.control.ListView?>
+<VBox fx:controller="com.example.java2.client.Controller" xmlns:fx="http://javafx.com/fxml" alignment="center">
+    <HBox fx:id="authPanel">
+        <TextField HBox.hgrow="ALWAYS" fx:id="loginField" promptText="Login" />
+        <PasswordField HBox.hgrow="ALWAYS" fx:id="passField" promptText="Password" onAction="#sendAuth" />
+        <Button HBox.hgrow="ALWAYS" text="Connect" onAction="#sendAuth" />
+    </HBox>
+
+    <HBox VBox.vgrow="ALWAYS">
+        <TextArea HBox.hgrow="ALWAYS" fx:id="textArea" editable="false"/>
+        <ListView fx:id="clientsList" minWidth="200" maxWidth="200" />
+    </HBox>
+
+    <HBox fx:id="msgPanel">
+        <TextField fx:id="msgField" promptText="Enter your message..." HBox.hgrow="ALWAYS" onAction="#sendMsg"/>
+        <Button text="Send" onAction="#sendMsg"/>
+    </HBox>
+</VBox>
