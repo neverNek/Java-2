@@ -1,8 +1,6 @@
 package com.example.java2.server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 public class ClientHandler {
@@ -68,6 +66,12 @@ public class ClientHandler {
         try {
             while (true) {
                 final String msg = in.readUTF();
+                String fileName = "history_" + nick + ".txt";
+                try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName))){
+                    bufferedWriter.write(msg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 if ("/end".equals(msg)) {
                     break;
                 }
