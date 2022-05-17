@@ -5,25 +5,29 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChatServer {
 
     private final List<ClientHandler> clients;
-    private final AuthService authService;
+//    private final AuthService authService;
 
     public ChatServer() {
         clients = new ArrayList<>();
-        authService = new InMemoryAuthService();
-        authService.start();
+//        authService = new InMemoryAuthService();
+//        authService.start();
+
     }
 
     public void run() {
         try (ServerSocket serverSocket = new ServerSocket(8189)) {
             while (true) {
+                AuthService dbAuthService = new DbAuthService();
                 System.out.println("Ожидаем подключение клиента...");
                 final Socket socket = serverSocket.accept();
                 System.out.println("Клиент подключился");
-                new ClientHandler(socket, this, authService);
+                new ClientHandler(socket, this, dbAuthService);
             }
         } catch (IOException e) {
             throw new RuntimeException("Ошибка сервера", e);

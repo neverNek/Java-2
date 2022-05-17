@@ -1,5 +1,6 @@
 package com.example.java2.server;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class InMemoryAuthService implements AuthService {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
         System.out.println("Сервис аутентификации остановлен");
     }
 }

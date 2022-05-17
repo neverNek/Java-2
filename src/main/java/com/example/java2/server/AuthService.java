@@ -1,6 +1,7 @@
 package com.example.java2.server;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 public interface AuthService extends Closeable {
 
@@ -8,5 +9,5 @@ public interface AuthService extends Closeable {
 
     void start();
 
-    void close();
+    void close() throws IOException;
 }
