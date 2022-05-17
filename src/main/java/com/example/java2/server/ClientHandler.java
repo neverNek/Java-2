@@ -67,7 +67,7 @@ public class ClientHandler {
             while (true) {
                 final String msg = in.readUTF();
                 String fileName = "history_" + nick + ".txt";
-                try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName))){
+                try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName))) {
                     bufferedWriter.write(msg);
                 } catch (IOException e) {
                     e.printStackTrace();
