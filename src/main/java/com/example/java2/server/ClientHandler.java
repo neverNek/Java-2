@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
 
 public class ClientHandler {
     private final Socket socket;
@@ -12,7 +11,7 @@ public class ClientHandler {
     private String nick;
     private final DataInputStream in;
     private final DataOutputStream out;
-    private AuthService DbAuthService;
+    private AuthService dbAuthService;
 
     public ClientHandler(Socket socket, ChatServer server, AuthService dbAuthService) {
         try {
@@ -20,7 +19,7 @@ public class ClientHandler {
             this.server = server;
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
-            this.DbAuthService = DbAuthService;
+            this.dbAuthService = dbAuthService;
 
             new Thread(() -> {
                 try {
@@ -43,7 +42,7 @@ public class ClientHandler {
                     final String[] s = msg.split(" "); // s[0] = "/auth", s[1] = "login1", s[2] = "pass1"
                     final String login = s[1];
                     final String password = s[2];
-                    final String nick = DbAuthService.getNickByLoginAndPassword(login, password);
+                    final String nick = dbAuthService.getNickByLoginAndPassword(login, password);
                     for (String s1 : s) {
                         System.out.println(s1);
                     }
