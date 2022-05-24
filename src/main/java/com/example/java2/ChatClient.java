@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ChatClient {
 
@@ -11,7 +13,9 @@ public class ChatClient {
     private DataInputStream in;
     private DataOutputStream out;
 
-    private ClientController controller;
+    private final ClientController controller;
+
+    ExecutorService service = Executors.newFixedThreadPool(10);
 
     public ChatClient(ClientController controller) {
         this.controller = controller;
@@ -21,14 +25,26 @@ public class ChatClient {
         socket = new Socket("localhost", 8189);
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
-        new Thread(() -> {
+
+        service.execute(() -> {
             try {
                 waitAuth();
                 readMessage();
             } finally {
                 closeConnection();
             }
-        }).start();
+        });
+
+        service.shutdown();
+
+//        new Thread(() -> {
+//            try {
+//                waitAuth();
+//                readMessage();
+//            } finally {
+//                closeConnection();
+//            }
+//        }).start();
 
     }
 

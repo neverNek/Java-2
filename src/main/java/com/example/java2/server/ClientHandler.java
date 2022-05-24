@@ -2,6 +2,8 @@ package com.example.java2.server;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientHandler {
     private final Socket socket;
@@ -11,6 +13,8 @@ public class ClientHandler {
     private final DataOutputStream out;
     private AuthService authService;
 
+    ExecutorService service = Executors.newFixedThreadPool(10);
+
     public ClientHandler(Socket socket, ChatServer server, AuthService authService) {
         try {
             this.socket = socket;
@@ -19,18 +23,29 @@ public class ClientHandler {
             this.out = new DataOutputStream(socket.getOutputStream());
             this.authService = authService;
 
-            new Thread(() -> {
+            service.execute(() -> {
                 try {
                     authenticate();
                     readMessage();
                 } finally {
                     closeConnection();
                 }
-            }).start();
+            });
+
+//            new Thread(() -> {
+//                try {
+//                    authenticate();
+//                    readMessage();
+//                } finally {
+//                    closeConnection();
+//                }
+//            }).start();
         } catch (IOException e) {
             throw new RuntimeException("Ошибка создания подключения к клиенту", e);
         }
+        service.shutdown();
     }
+
 
     private void authenticate() {
         while (true) {
