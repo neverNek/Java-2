@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class ClientHandler {
+    private static final int AUTH_TIMEOUT = 120_000;
     private final Socket socket;
     private final ChatServer server;
     private String nick;
     private final DataInputStream in;
     private final DataOutputStream out;
     private AuthService authService;
+    private Thread timeoutThread;
 
     public ClientHandler(Socket socket, ChatServer server, AuthService authService) {
         try {
@@ -20,6 +22,17 @@ public class ClientHandler {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
             this.authService = authService;
+
+            this.timeoutThread = new Thread(() -> {
+                try {
+                    Thread.sleep(AUTH_TIMEOUT);
+                    closeConnection();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            });
+            timeoutThread.start();
 
             new Thread(() -> {
                 try {
@@ -51,6 +64,7 @@ public class ClientHandler {
                             sendMessage("Пользователь уже авторизован");
                             continue;
                         }
+                        this.timeoutThread.interrupt();
                         sendMessage("/authok " + nick); // /authok nick1
                         this.nick = nick;
                         server.broadcast("Пользователь " + nick + " вошёл в чат");
